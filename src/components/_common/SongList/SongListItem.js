@@ -7,6 +7,7 @@ import { convertSecondsToMinutes } from '@features/player/utilities'
 import PlayerStore from '@features/player/store'
 
 export default function SongListItem({ track }) {
+  console.log('SongListItem', track)
   const [hover, setHover] = useState(false)
 
   if (track.previewUrl === null) {

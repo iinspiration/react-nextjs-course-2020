@@ -2,12 +2,13 @@ import React from 'react'
 import { Flex, Box } from '@grid'
 import withPage from '@lib/page/withPage'
 import { useMember } from '@lib/auth'
-
+import { Fetch } from '@lib/api'
+import * as AlbumService from '@features/album/services'
 import DetailPageHeader from '@components/_common/DetailPageHeader'
 import SongList from '@common/SongList'
 
 AlbumDetailPage.defaultProps = {
-  data: {
+  dataw: {
     title: 'KILL THIS LOVE',
     subTitle: 'BLACKPINK',
     bottomLine: '2019 • 5 Tracks',
@@ -47,7 +48,13 @@ AlbumDetailPage.defaultProps = {
   },
 }
 
-function AlbumDetailPage({ data }) {
+function AlbumDetailPage(props) {
+  console.log('AlbumDetailPage', props)
+  const {
+    router: {
+      query: { id },
+    },
+  } = props
   const { token } = useMember()
 
   if (token === null) {
@@ -56,12 +63,42 @@ function AlbumDetailPage({ data }) {
 
   return (
     <Flex flexWrap="wrap" css={{ padding: '60px 120px' }}>
-      <Box width={1 / 3}>
-        <DetailPageHeader data={data} />
-      </Box>
-      <Box width={2 / 3}>
-        <SongList tracks={data.tracks} />
-      </Box>
+      <Fetch service={() => AlbumService.getAlbumById(id, { token })}>
+        {props => {
+          const { data } = props
+          console.log('props', props)
+          return (
+            <React.Fragment>
+              <Box width={1 / 3}>
+                <DetailPageHeader
+                  data={{
+                    image: data.images[0].url,
+                    title: data.name,
+                    subTitle: data.label,
+                    bottomLine: '',
+                  }}
+                />
+              </Box>
+              <Box width={2 / 3}>
+                <SongList
+                  tracks={data.tracks.items.map(track => {
+                    return {
+                      ...track,
+                      artist: track.artists
+                        .map(artist => {
+                          return artist.name
+                        })
+                        .join(),
+                      album: data.name,
+                      durationMs: track.duration_ms,
+                    }
+                  })}
+                />
+              </Box>
+            </React.Fragment>
+          )
+        }}
+      </Fetch>
     </Flex>
   )
 }

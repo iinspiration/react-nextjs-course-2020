@@ -3,7 +3,9 @@ import { Flex, Box } from '@grid'
 import Button from '@common/Button'
 import colors from '@features/_ui/colors'
 
-export default function DetailPageHeader({ data }) {
+export default function DetailPageHeader(props) {
+  const { data } = props
+  console.log('DetailPageHeader', props)
   return (
     <Flex flexWrap="wrap" css={{ padding: '20px 70px' }}>
       <Box width={1}>

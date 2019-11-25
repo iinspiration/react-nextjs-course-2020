@@ -5,20 +5,9 @@ import withPage from '@lib/page/withPage'
 import colors from '@features/_ui/colors'
 import AlbumList from './AlbumList'
 
-HomePage.defaultProps = {
-  albums: [
-    {
-      id: '2Pz8VAMiGc9UW1rrbBRDuO',
-      name: 'KILL THIS LOVE',
-      images: [
-        {
-          url:
-            'https://i.scdn.co/image/ab67616d0000b273adf560d7d93b65c10b58ccda',
-        },
-      ],
-    },
-  ],
-}
+import { Fetch } from '@lib/api'
+
+import * as AlbumService from '@features/album/services'
 
 function HomePage({ albums }) {
   const { token } = useMember()
@@ -39,7 +28,13 @@ function HomePage({ albums }) {
           New Releases
         </h1>
       </Box>
-      <AlbumList albums={albums} />
+      <Fetch service={() => AlbumService.getNewReleases({ token, limit: 12 })}>
+        {({ data }) => <AlbumList albums={data.albums.items} />}
+        {/* {props => {
+          console.log('props', props)
+          return <AlbumList albums={albums} />
+        }} */}
+      </Fetch>
     </Flex>
   )
 }

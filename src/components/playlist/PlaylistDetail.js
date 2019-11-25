@@ -2,7 +2,8 @@ import React from 'react'
 import { Flex, Box } from '@grid'
 import { useMember } from '@lib/auth'
 import withPage from '@lib/page/withPage'
-
+import { Fetch } from '@lib/api'
+import * as PlaylistService from '@features/playlist/services'
 import DetailPageHeader from '@components/_common/DetailPageHeader'
 import SongList from '@common/SongList'
 
@@ -48,7 +49,13 @@ PlaylistDetailPage.defaultProps = {
   },
 }
 
-function PlaylistDetailPage({ data }) {
+function PlaylistDetailPage(props) {
+  console.log('PlaylistDetailPage', props)
+  const {
+    router: {
+      query: { id },
+    },
+  } = props
   const { token } = useMember()
 
   if (token === null) {
@@ -57,12 +64,42 @@ function PlaylistDetailPage({ data }) {
 
   return (
     <Flex flexWrap="wrap" css={{ padding: '60px 120px' }}>
-      <Box width={1 / 3}>
-        <DetailPageHeader data={data} />
-      </Box>
-      <Box width={2 / 3}>
-        <SongList tracks={data.tracks} />
-      </Box>
+      <Fetch service={() => PlaylistService.getPlaylistById(id, { token })}>
+        {props => {
+          const { data } = props
+          console.log('data', data)
+          return (
+            <React.Fragment>
+              <Box width={1 / 3}>
+                <DetailPageHeader
+                  data={{
+                    image: data.images[0].url,
+                    title: data.name,
+                    subTitle: data.label,
+                    bottomLine: '',
+                  }}
+                />
+              </Box>
+              <Box width={2 / 3}>
+                <SongList
+                  tracks={data.tracks.items.map(track => {
+                    return {
+                      ...track.track,
+                      artist: track.track.artists
+                        .map(artist => {
+                          return artist.name
+                        })
+                        .join(),
+                      album: data.name,
+                      durationMs: track.track.duration_ms,
+                    }
+                  })}
+                />
+              </Box>
+            </React.Fragment>
+          )
+        }}
+      </Fetch>
     </Flex>
   )
 }
