@@ -66,11 +66,26 @@ function AlbumDetailPage(props) {
       <Fetch service={() => AlbumService.getAlbumById(id, { token })}>
         {props => {
           const { data } = props
-          console.log('props', props)
+          // console.log('props', props)
+          const tracks = data.tracks.items.map(track => {
+            return {
+              ...track,
+              artist: track.artists
+                .map(artist => {
+                  return artist.name
+                })
+                .join(),
+              album: data.name,
+              image: data.images[0].url,
+              durationMs: track.duration_ms,
+              previewUrl: track.preview_url,
+            }
+          })
           return (
             <React.Fragment>
               <Box width={1 / 3}>
                 <DetailPageHeader
+                  tracks={tracks}
                   data={{
                     image: data.images[0].url,
                     title: data.name,
@@ -80,20 +95,7 @@ function AlbumDetailPage(props) {
                 />
               </Box>
               <Box width={2 / 3}>
-                <SongList
-                  tracks={data.tracks.items.map(track => {
-                    return {
-                      ...track,
-                      artist: track.artists
-                        .map(artist => {
-                          return artist.name
-                        })
-                        .join(),
-                      album: data.name,
-                      durationMs: track.duration_ms,
-                    }
-                  })}
-                />
+                <SongList tracks={tracks} />
               </Box>
             </React.Fragment>
           )

@@ -1,13 +1,24 @@
+import { observable, action } from 'mobx'
 export default class PlayerStore {
+  @observable
   nowPlaying = {
-    playing: true,
-    title: 'ไกลแค่ไหน คือ ใกล้',
-    subTitle: 'Getsunova',
-    image: 'https://i.scdn.co/image/ab67616d0000b273e76e64aa449965dd5e439c53',
-    url:
-      'https://p.scdn.co/mp3-preview/f0521c21357ae522872b59cf4dd082ad65880fe8?cid=e4abb1ea8fdf4926a463960abd146fcb',
+    playing: false,
+    title: '',
+    subTitle: '',
+    image: '',
+    url: '',
+    timeElapsed: 0,
+    progress: 0,
+    duration: 0,
+  }
+  @observable
+  queue = {
+    status: '',
+    currentIndex: 0,
+    tracks: [],
   }
 
+  @action
   play(track) {
     const { previewUrl, name, artist, image } = track
 
@@ -17,6 +28,32 @@ export default class PlayerStore {
     this.nowPlaying.image = image
     this.nowPlaying.url = previewUrl
 
-    console.log('Now Playing:', this.nowPlaying.title)
+    console.log('Now Playing:', track)
+  }
+  @action
+  togglePlayState() {
+    this.nowPlaying.playing = !this.nowPlaying.playing
+    console.log('togglePlayState')
+  }
+
+  @action
+  addToQueue(tracks) {
+    this.queue.tracks = [...this.queue.tracks, ...tracks]
+    console.log('addToQueue', tracks)
+  }
+
+  @action
+  replaceQueue(tracks) {
+    this.queue.tracks = [...tracks]
+    console.log('replaceQueue', tracks)
+    this.play(this.queue.tracks[this.queue.currentIndex])
+  }
+
+  @action
+  setProgress(playingData) {
+    const { timeElapsed, progress, duration } = playingData
+    this.nowPlaying.timeElapsed = timeElapsed
+    this.nowPlaying.progress = progress
+    this.nowPlaying.duration = duration
   }
 }

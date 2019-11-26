@@ -2,9 +2,12 @@ import React from 'react'
 import { Flex, Box } from '@grid'
 import Button from '@common/Button'
 import colors from '@features/_ui/colors'
+import { inject } from '@lib/store'
 
-export default function DetailPageHeader(props) {
-  const { data } = props
+export default inject('playerStore')(DetailPageHeader)
+
+function DetailPageHeader(props) {
+  const { data, tracks, playerStore } = props
   console.log('DetailPageHeader', props)
   return (
     <Flex flexWrap="wrap" css={{ padding: '20px 70px' }}>
@@ -25,7 +28,12 @@ export default function DetailPageHeader(props) {
             {data.subTitle}
           </p>
           <p>
-            <Button>Play</Button>
+            <Button
+              onClick={() => {
+                playerStore.replaceQueue(tracks)
+              }}>
+              Play
+            </Button>
           </p>
           <p css={{ paddingTop: '15px', fontSize: '0.7em' }}>
             {data.bottomLine}

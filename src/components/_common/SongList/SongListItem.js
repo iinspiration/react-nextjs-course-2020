@@ -3,18 +3,16 @@ import { FontAwesomeIcon as Icon } from '@fortawesome/react-fontawesome'
 import { Flex, Box } from '@grid'
 import colors from '@features/_ui/colors'
 import { convertSecondsToMinutes } from '@features/player/utilities'
+import { inject } from '@lib/store'
 
-import PlayerStore from '@features/player/store'
+export default inject('playerStore')(SongListItem)
 
-export default function SongListItem({ track }) {
-  console.log('SongListItem', track)
+function SongListItem({ playerStore, track }) {
   const [hover, setHover] = useState(false)
 
   if (track.previewUrl === null) {
     return null
   }
-
-  const playerStore = new PlayerStore()
 
   return (
     <Box
@@ -42,7 +40,16 @@ export default function SongListItem({ track }) {
             }}
             onClick={() => {
               console.log('Play', track)
-              playerStore.play(track)
+              playerStore.play({
+                ...track,
+                previewUrl: track.preview_url,
+              })
+              playerStore.replaceQueue([
+                {
+                  ...track,
+                  previewUrl: track.preview_url,
+                },
+              ])
             }}>
             <Icon
               icon={hover ? 'play' : 'music'}
@@ -84,7 +91,10 @@ export default function SongListItem({ track }) {
               height: '30px',
               cursor: 'pointer',
             }}
-            onClick={() => {}}>
+            onClick={() => {
+              console.log('addToQueue', track)
+              playerStore.addToQueue([track])
+            }}>
             <Icon
               icon="plus-circle"
               css={{

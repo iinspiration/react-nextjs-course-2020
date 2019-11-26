@@ -4,11 +4,12 @@ import { flowRight as compose } from 'lodash'
 import { useMember } from '@lib/auth'
 import withPage from '@lib/page/withPage'
 import colors from '@features/_ui/colors'
+import { inject } from '@lib/store'
 
 import SongList from '@common/SongList'
 
 QueuePage.defaultProps = {
-  tracks: [
+  tracksx: [
     {
       name: 'ไกลแค่ไหน คือ ใกล้',
       artist: 'เก็ทสึโนว่า',
@@ -39,12 +40,16 @@ QueuePage.defaultProps = {
   ],
 }
 
-function QueuePage({ tracks }) {
+function QueuePage(props) {
+  // const { tracks } = props
   const { token } = useMember()
+  const { tracks } = props.playerStore.queue
 
   if (token === null) {
     return null
   }
+
+  console.log('queue', tracks)
 
   return (
     <Flex flexWrap="wrap" css={{ padding: '60px 120px' }}>
@@ -65,4 +70,6 @@ function QueuePage({ tracks }) {
   )
 }
 
-export default compose(withPage({ restricted: true }))(QueuePage)
+export default inject('playerStore')(
+  compose(withPage({ restricted: true }))(QueuePage),
+)

@@ -1,12 +1,11 @@
 import React from 'react'
 import ReactPlayer from 'react-player'
+import { inject } from '@lib/store'
 
-import PlayerStore from '@features/player/store'
-
-function Player() {
-  const playerStore = new PlayerStore()
+function Player({ playerStore }) {
   const { url, playing } = playerStore.nowPlaying
-
+  console.log('Player url', url)
+  console.log('Player playing', playing)
   return (
     <ReactPlayer
       css={{ display: 'none' }}
@@ -15,7 +14,14 @@ function Player() {
       progressInterval={50}
       volume={0.8}
       muted={false}
-      onProgress={data => console.log('onProgress', data)}
+      onProgress={data => {
+        // console.log('onProgress', data)
+        playerStore.setProgress({
+          timeElapsed: data.playedSeconds,
+          progress: data.played,
+          duration: data.loadedSeconds,
+        })
+      }}
       onEnded={() => {
         console.log('onEnded')
       }}
@@ -23,4 +29,4 @@ function Player() {
   )
 }
 
-export default Player
+export default inject('playerStore')(Player)

@@ -1,5 +1,6 @@
 import React from 'react'
 import { Flex, Box } from '@grid'
+import { flowRight as compose } from 'lodash'
 import { useMember } from '@lib/auth'
 import withPage from '@lib/page/withPage'
 import { Fetch } from '@lib/api'
@@ -67,11 +68,26 @@ function PlaylistDetailPage(props) {
       <Fetch service={() => PlaylistService.getPlaylistById(id, { token })}>
         {props => {
           const { data } = props
-          console.log('data', data)
+          // console.log('data', data)
+          const tracks = data.tracks.items.map(track => {
+            return {
+              ...track.track,
+              artist: track.track.artists
+                .map(artist => {
+                  return artist.name
+                })
+                .join(),
+              album: data.name,
+              image: data.images[0].url,
+              durationMs: track.track.duration_ms,
+              previewUrl: track.track.preview_url,
+            }
+          })
           return (
             <React.Fragment>
               <Box width={1 / 3}>
                 <DetailPageHeader
+                  tracks={tracks}
                   data={{
                     image: data.images[0].url,
                     title: data.name,
@@ -81,20 +97,7 @@ function PlaylistDetailPage(props) {
                 />
               </Box>
               <Box width={2 / 3}>
-                <SongList
-                  tracks={data.tracks.items.map(track => {
-                    return {
-                      ...track.track,
-                      artist: track.track.artists
-                        .map(artist => {
-                          return artist.name
-                        })
-                        .join(),
-                      album: data.name,
-                      durationMs: track.track.duration_ms,
-                    }
-                  })}
-                />
+                <SongList tracks={tracks} />
               </Box>
             </React.Fragment>
           )
@@ -104,4 +107,4 @@ function PlaylistDetailPage(props) {
   )
 }
 
-export default withPage({ restricted: true })(PlaylistDetailPage)
+export default compose(withPage({ restricted: true }))(PlaylistDetailPage)

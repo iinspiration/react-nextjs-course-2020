@@ -1,15 +1,11 @@
 import React from 'react'
 import { Flex, Box } from '@grid'
+import { convertSecondsToMinutes } from '@features/player/utilities'
 
-ProgressBar.defaultProps = {
-  timeElapsed: '0:00',
-  progress: 0.2,
-  duration: '0:30',
-}
+import { inject } from '@lib/store'
 
 function ProgressBar(props) {
-  const { timeElapsed, progress, duration } = props
-
+  const { timeElapsed, progress, duration } = props.playerStore.nowPlaying
   return (
     <Flex
       justifyContent="space-between"
@@ -18,7 +14,9 @@ function ProgressBar(props) {
         height: '20px',
         alignItems: 'center',
       }}>
-      <Box css={{ fontSize: '0.7em', padding: '10px' }}>{timeElapsed}</Box>
+      <Box css={{ fontSize: '0.7em', padding: '10px' }}>
+        {convertSecondsToMinutes(timeElapsed)}
+      </Box>
       <Box
         css={{
           flex: 1,
@@ -69,9 +67,11 @@ function ProgressBar(props) {
           />
         </div>
       </Box>
-      <Box css={{ fontSize: '0.7em', padding: '10px' }}>{duration}</Box>
+      <Box css={{ fontSize: '0.7em', padding: '10px' }}>
+        {convertSecondsToMinutes(duration)}
+      </Box>
     </Flex>
   )
 }
 
-export default ProgressBar
+export default inject('playerStore')(ProgressBar)
