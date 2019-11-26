@@ -7,7 +7,11 @@ import { inject } from '@lib/store'
 
 export default inject('playerStore')(SongListItem)
 
-function SongListItem({ playerStore, track }) {
+function SongListItem({ isPlaying, playerStore, track, type, index }) {
+  const {
+    queue: { tracks = [] },
+    nowPlaying,
+  } = playerStore
   const [hover, setHover] = useState(false)
 
   if (track.previewUrl === null) {
@@ -40,19 +44,22 @@ function SongListItem({ playerStore, track }) {
             }}
             onClick={() => {
               console.log('Play', track)
-              playerStore.play({
-                ...track,
-                previewUrl: track.preview_url,
-              })
-              playerStore.replaceQueue([
-                {
-                  ...track,
-                  previewUrl: track.preview_url,
-                },
-              ])
+              if (type === 'queue') {
+                console.log('play on index', index)
+                playerStore.setPlayIndex(index)
+              } else {
+                playerStore.replaceQueue([
+                  {
+                    ...track,
+                    previewUrl: track.preview_url,
+                  },
+                ])
+              }
             }}>
             <Icon
-              icon={hover ? 'play' : 'music'}
+              icon={
+                nowPlaying.id === track.id ? 'pause' : hover ? 'play' : 'music'
+              }
               css={{
                 color: colors.link,
               }}
@@ -83,25 +90,54 @@ function SongListItem({ playerStore, track }) {
             fontSize: '0.85em',
             color: colors.link,
           }}>
-          <button
-            css={{
-              backgroundColor: 'transparent',
-              border: 'none',
-              width: '30px',
-              height: '30px',
-              cursor: 'pointer',
-            }}
-            onClick={() => {
-              console.log('addToQueue', track)
-              playerStore.addToQueue([track])
-            }}>
-            <Icon
-              icon="plus-circle"
+          {type === 'queue' ? (
+            <button
               css={{
-                color: colors.link,
+                backgroundColor: 'transparent',
+                border: 'none',
+                width: '30px',
+                height: '30px',
+                cursor: 'pointer',
               }}
-            />
-          </button>
+              onClick={() => {
+                playerStore.removeFromQueue(track.id)
+              }}>
+              <Icon
+                icon="times-circle"
+                css={{
+                  color: colors.link,
+                }}
+              />
+            </button>
+          ) : (
+            <button
+              css={{
+                backgroundColor: 'transparent',
+                border: 'none',
+                width: '30px',
+                height: '30px',
+                cursor: 'pointer',
+              }}
+              onClick={() => {
+                console.log('addToQueue', track)
+                const isDub = tracks.find(each => {
+                  return each.previewUrl === track.preview_url
+                })
+                console.log('isDub', isDub)
+                if (!isDub) {
+                  playerStore.addToQueue([track])
+                } else {
+                  console.log('duplicate track')
+                }
+              }}>
+              <Icon
+                icon="plus-circle"
+                css={{
+                  color: colors.link,
+                }}
+              />
+            </button>
+          )}
         </Box>
         <Box
           css={{

@@ -33,13 +33,30 @@ function ButtonControl({ icon, circle = false, active = false, onClick }) {
 
 function ControlPanel({ playerStore }) {
   const { playing } = playerStore.nowPlaying
+  const { queue } = playerStore
+  const {
+    queue: { status },
+  } = playerStore
   return (
     <Flex>
       <Box>
-        <ButtonControl icon="random" active={false} onClick={() => {}} />
+        <ButtonControl
+          icon="random"
+          active={status === 'random'}
+          onClick={() => {
+            playerStore.setQueueStatus(
+              status !== 'random' ? 'random' : 'normal',
+            )
+          }}
+        />
       </Box>
       <Box>
-        <ButtonControl icon="step-backward" onClick={() => {}} />
+        <ButtonControl
+          icon="step-backward"
+          onClick={() => {
+            playerStore.setPlayIndex(queue.currentIndex - 1)
+          }}
+        />
       </Box>
       <Box>
         <ButtonControl
@@ -51,10 +68,36 @@ function ControlPanel({ playerStore }) {
         />
       </Box>
       <Box>
-        <ButtonControl icon="step-forward" onClick={() => {}} />
+        <ButtonControl
+          icon="step-forward"
+          onClick={() => {
+            const nextIndex = queue.currentIndex + 1
+            if (queue.status === 'random') {
+              playerStore.setPlayIndex(
+                Math.floor(Math.random() * Math.floor(queue.tracks.length)),
+              )
+            } else if (queue.status === 'repeat') {
+              if (queue.currentIndex === queue.tracks.length - 1) {
+                playerStore.setPlayIndex(0)
+              } else {
+                playerStore.setPlayIndex(nextIndex)
+              }
+            } else {
+              playerStore.setPlayIndex(nextIndex)
+            }
+          }}
+        />
       </Box>
       <Box>
-        <ButtonControl icon="redo-alt" active={false} onClick={() => {}} />
+        <ButtonControl
+          icon="redo-alt"
+          active={status === 'repeat'}
+          onClick={() => {
+            playerStore.setQueueStatus(
+              status !== 'repeat' ? 'repeat' : 'normal',
+            )
+          }}
+        />
       </Box>
     </Flex>
   )

@@ -5,7 +5,8 @@ import { convertSecondsToMinutes } from '@features/player/utilities'
 import { inject } from '@lib/store'
 
 function ProgressBar(props) {
-  const { timeElapsed, progress, duration } = props.playerStore.nowPlaying
+  const { playerStore } = props
+  const { timeElapsed, progress, duration } = playerStore.nowPlaying
   return (
     <Flex
       justifyContent="space-between"
@@ -62,7 +63,9 @@ function ProgressBar(props) {
             value={progress}
             onClick={() => {}}
             onMouseDown={() => {}}
-            onChange={() => {}}
+            onChange={e => {
+              playerStore.player.current.seekTo(e.target.value)
+            }}
             onMouseUp={() => {}}
           />
         </div>

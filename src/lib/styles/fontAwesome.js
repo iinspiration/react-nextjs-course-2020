@@ -16,6 +16,7 @@ import {
   faVolumeMute,
   faPlusCircle,
   faMusic,
+  faTimesCircle,
 } from '@fortawesome/free-solid-svg-icons'
 
 config.autoAddCss = false
@@ -37,4 +38,5 @@ library.add(
   faVolumeMute,
   faPlusCircle,
   faMusic,
+  faTimesCircle,
 )

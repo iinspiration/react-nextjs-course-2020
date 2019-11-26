@@ -8,40 +8,7 @@ import { inject } from '@lib/store'
 
 import SongList from '@common/SongList'
 
-QueuePage.defaultProps = {
-  tracksx: [
-    {
-      name: 'ไกลแค่ไหน คือ ใกล้',
-      artist: 'เก็ทสึโนว่า',
-      album: 'Getsunova',
-      image: 'https://i.scdn.co/image/ab67616d0000b273e76e64aa449965dd5e439c53',
-      previewUrl:
-        'https://p.scdn.co/mp3-preview/f0521c21357ae522872b59cf4dd082ad65880fe8?cid=e4abb1ea8fdf4926a463960abd146fcb',
-      durationMs: 266146,
-    },
-    {
-      name: 'อยู่ตรงนี้ นานกว่านี้',
-      artist: 'เก็ทสึโนว่า',
-      album: 'The First Album',
-      image: 'https://i.scdn.co/image/ab67616d0000b2730c8ea14417dc06dccdffe01c',
-      previewUrl:
-        'https://p.scdn.co/mp3-preview/d107d61f0964af539e6843526e517f8c2c0fa25e?cid=e4abb1ea8fdf4926a463960abd146fcb',
-      durationMs: 260320,
-    },
-    {
-      name: 'มือลั่น',
-      artist: 'แจ๊ส สปุ๊กนิค ปาปิยอง กุ๊กกุ๊ก',
-      album: 'มือลั่น',
-      image: 'https://i.scdn.co/image/ab67616d0000b273f188738a110aae9520d4daaf',
-      previewUrl:
-        'https://p.scdn.co/mp3-preview/b97d8d8d47ad52ea8ef613261d17b6fb51fa447f?cid=e4abb1ea8fdf4926a463960abd146fcb',
-      durationMs: 192106,
-    },
-  ],
-}
-
 function QueuePage(props) {
-  // const { tracks } = props
   const { token } = useMember()
   const { tracks } = props.playerStore.queue
 
@@ -64,12 +31,13 @@ function QueuePage(props) {
         </h1>
       </Box>
       <Box width={1}>
-        <SongList tracks={tracks} />
+        <SongList tracks={tracks} type={'queue'} />
       </Box>
     </Flex>
   )
 }
 
-export default inject('playerStore')(
-  compose(withPage({ restricted: true }))(QueuePage),
-)
+export default compose(
+  withPage({ restricted: true }),
+  inject('playerStore'),
+)(QueuePage)
